@@ -1,6 +1,6 @@
 # Build Docker image for this app to be published to Azure Container Registry
 pool:
-  vmImage: 'ubuntu-16.0.4'
+  vmImage: 'ubuntu-16.04'
 variables:
   buildConfiguration: 'Release'
   dockerId: test
