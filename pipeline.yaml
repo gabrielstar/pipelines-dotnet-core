@@ -1,0 +1,20 @@
+# Build Docker image for this app to be published to Azure Container Registry
+pool:
+  vmImage: 'ubuntu-latest'
+variables:
+  buildConfiguration: 'Release'
+  dockerId: test
+
+steps:
+  - script: |
+      docker build -f Dockerfile.build -t $(dockerId)/dotnetcore-build:$BUILD_BUILDID .
+      docker run --name dotnetcoreapp --rm -d $(dockerId)/dotnetcore-build:$BUILD_BUILDID
+      docker cp dotnetcoreapp:app/dotnetcore-tests/TestResults $(System.DefaultWorkingDirectory)
+      docker cp dotnetcoreapp:app/dotnetcore-sample/out $(System.DefaultWorkingDirectory)
+      docker stop dotnetcoreapp
+
+  - task: PublishTestResults@2
+    inputs:
+      testRunner: VSTest
+      testResultsFiles: '**/*.trx'
+      failTaskOnFailedTests: true
